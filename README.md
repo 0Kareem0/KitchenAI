@@ -1,6 +1,5 @@
 # 🍳 KitchenAI - Smart Recipe Generator
 
-![Project Preview](https://via.placeholder.com/800x400?text=KitchenAI+Preview)
 
 A **React-based web app** that helps you generate recipes from ingredients you have at home.  
 Built with **React, Tailwind CSS, and Local Storage**.
