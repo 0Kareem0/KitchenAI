@@ -8,7 +8,7 @@ export default function Page() {
     <>
       <Navbar />
       <Entry />
-      <Footer />
+      {/* <Footer /> */}
       
     </>
   );
