@@ -10,7 +10,8 @@ export default function Main() {
     "pasta",
     "ground beef",
     "tomato paste",
-  ]);
+  ]); 
+  
   console.log(ingredients);
   const [recipeShown, setRecipeShown] = useState("");
   const getRecipe = async () => {
