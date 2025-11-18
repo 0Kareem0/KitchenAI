@@ -17,10 +17,11 @@ Built with **React, Tailwind CSS, and Local Storage**.
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
  
 ## 🎯 Live Demo
-[[[[https://kitchenai-kareem.netlify.app](https://kitchen-ai-seven.vercel.app/)](https://astounding-starship-0163a7.netlify.app/](https://kitchen-ai-seven.vercel.app/))]
+[[[[https://kitchenai-kareem.netlify.app](https://kitchen-ai-seven.vercel.app/)]
 ---
 
 **Made with ❤️ by [Kareem](https://github.com/0Kareem0)**
+
 
 
 
