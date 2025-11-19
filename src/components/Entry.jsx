@@ -3,29 +3,39 @@ import IngredientsList from "../components/IngredientsList";
 import ClaudeRecipe from "../components/ClaudeRecipe";
 import { getRecipeFromMistral } from "../logic/ai";
 
-
 export default function Main() {
   const [ingredients, setIngredients] = useState([
     "all the main spices",
     "pasta",
     "ground beef",
     "tomato paste",
-  ]); 
-  
-  console.log(ingredients);
+  ]);
+
   const [recipeShown, setRecipeShown] = useState("");
+  const [isLoading, setIsLoading] = useState(false); // ← NEW: loading state
+
   const getRecipe = async () => {
-    const recipe = await getRecipeFromMistral(ingredients);
-    setRecipeShown(recipe);
-    console.log(recipe);
-    
+    setIsLoading(true); // Start loading
+    setRecipeShown(""); // Optional: clear previous recipe
+    try {
+      const recipe = await getRecipeFromMistral(ingredients);
+      setRecipeShown(recipe);
+    } catch (error) {
+      console.error("Failed to fetch recipe:", error);
+      setRecipeShown("Sorry, something went wrong. Please try again.");
+    } finally {
+      setIsLoading(false); // Always stop loading
+    }
   };
 
   function handleSubmit(event) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    const newIngredient = formData.get("ingredient");
-    setIngredients((prevIngredients) => [...prevIngredients, newIngredient]);
+    const newIngredient = formData.get("ingredient").trim();
+    if (newIngredient) {
+      setIngredients((prev) => [...prev, newIngredient]);
+      event.target.reset(); // clear input after adding
+    }
   }
 
   return (
@@ -37,16 +47,21 @@ export default function Main() {
           aria-label="Add ingredient"
           name="ingredient"
         />
-        <button>Add ingredient</button>
+        <button type="submit">Add ingredient</button>
       </form>
+
       {ingredients.length ? (
-        <IngredientsList
-          getRecipe={getRecipe}
-          ingredients={ingredients}
-        />
+        <IngredientsList getRecipe={getRecipe} ingredients={ingredients} />
       ) : null}
-      {recipeShown ? <ClaudeRecipe recipe={recipeShown} /> : null}
+
+      {isLoading ? (
+        <div className="loading-container">
+          <div className="spinner" aria-label="Generating recipe..." />
+          <p>Thinking of the perfect recipe...</p>
+        </div>
+      ) : null}
+
+      {recipeShown && !isLoading ? <ClaudeRecipe recipe={recipeShown} /> : null}
     </main>
   );
 }
- 

@@ -19,6 +19,7 @@ export default function IngredientsList(props) {
           <button onClick={props.getRecipe}>Get a recipe</button>
         </div>
       ) : null}
+      
     </section>
   );
 }
