@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import IngredientsList from "../components/IngredientsList";
 import ClaudeRecipe from "../components/ClaudeRecipe";
 import { getRecipeFromMistral } from "../logic/ai";
@@ -13,6 +13,17 @@ export default function Main() {
 
   const [recipeShown, setRecipeShown] = useState("");
   const [isLoading, setIsLoading] = useState(false); // ← NEW: loading state
+  const recipeSection = useRef(null)
+  console.log(recipeSection.current);
+  
+
+       useEffect(()=>{
+        if(recipeShown !== "" && recipeSection.current){
+            recipeSection.current.scrollIntoView({ behavior: "smooth" });
+        }
+    }, [recipeShown])
+
+
 
   const getRecipe = async () => {
     setIsLoading(true); // Start loading
@@ -49,9 +60,8 @@ export default function Main() {
         />
         <button type="submit">Add ingredient</button>
       </form>
-
       {ingredients.length ? (
-        <IngredientsList getRecipe={getRecipe} ingredients={ingredients} />
+        <IngredientsList ref={recipeSection} getRecipe={getRecipe} ingredients={ingredients} />
       ) : null}
 
       {isLoading ? (
@@ -60,8 +70,7 @@ export default function Main() {
           <p>Thinking of the perfect recipe...</p>
         </div>
       ) : null}
-
-      {recipeShown && !isLoading ? <ClaudeRecipe recipe={recipeShown} /> : null}
+      {recipeShown && !isLoading ? <ClaudeRecipe recipe={recipeShown}/> : null}
     </main>
   );
 }
