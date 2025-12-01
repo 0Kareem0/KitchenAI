@@ -12,7 +12,7 @@ export default function Main() {
   ]);
 
   const [recipeShown, setRecipeShown] = useState("");
-  const [isLoading, setIsLoading] = useState(false); // ← NEW: loading state
+  const [isLoading, setIsLoading] = useState(false); 
   const recipeSection = useRef(null)
   console.log(recipeSection.current);
   
@@ -26,8 +26,8 @@ export default function Main() {
 
 
   const getRecipe = async () => {
-    setIsLoading(true); // Start loading
-    setRecipeShown(""); // Optional: clear previous recipe
+    setIsLoading(true); 
+    setRecipeShown(""); 
     try {
       const recipe = await getRecipeFromMistral(ingredients);
       setRecipeShown(recipe);
@@ -35,7 +35,7 @@ export default function Main() {
       console.error("Failed to fetch recipe:", error);
       setRecipeShown("Sorry, something went wrong. Please try again.");
     } finally {
-      setIsLoading(false); // Always stop loading
+      setIsLoading(false); 
     }
   };
 
@@ -45,7 +45,7 @@ export default function Main() {
     const newIngredient = formData.get("ingredient").trim();
     if (newIngredient) {
       setIngredients((prev) => [...prev, newIngredient]);
-      event.target.reset(); // clear input after adding
+      event.target.reset(); 
     }
   }
 
@@ -72,5 +72,6 @@ export default function Main() {
       ) : null}
       {recipeShown && !isLoading ? <ClaudeRecipe recipe={recipeShown}/> : null}
     </main>
-  );
-}
+  );    
+} 
+  
