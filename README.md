@@ -1,11 +1,17 @@
 # 👨‍🍳 Chef Claude AI — Gourmet Kitchen & Recipe Assistant
 
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://kitchen-ai-seven.vercel.app/)
 [![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
 [![Vite](https://img.shields.io/badge/Vite-7-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
 [![Llama 3.1](https://img.shields.io/badge/AI-Llama_3.1_8B-FF4F00?style=for-the-badge&logo=meta&logoColor=white)](https://huggingface.co/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
 
 An intelligent, luxury **AI-powered culinary assistant** built with React 19 and Meta Llama 3.1. Simply enter the ingredients available in your pantry, select your preferred cuisine style and dietary preferences, and let Chef Claude generate step-by-step gourmet recipes with prep checklists, kitchen timers, and nutritional macro estimates!
+
+> [!TIP]
+> 🌐 **Live Application Online!**  
+> Try Chef Claude in action right in your browser:  
+> 👉 **[https://kitchen-ai-seven.vercel.app/](https://kitchen-ai-seven.vercel.app/)**
 
 ---
 
@@ -88,13 +94,6 @@ chefClaude/
 ├── index.html                      # SEO metadata & Google Fonts
 └── package.json
 ```
-
----
-
-## 🌐 Live Demo
-
-Explore the live application on Vercel:  
-🔗 **[KitchenAI Live Demo](https://kitchen-ai-seven.vercel.app/)**
 
 ---
 
