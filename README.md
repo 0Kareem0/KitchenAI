@@ -17,7 +17,7 @@ Built with **React, Tailwind CSS, and Local Storage**.
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
  
 ## 🎯 Live Demo
-[([kitchen-ai-git-main-0kareem0s-projects.vercel.app](https://kitchen-3260ptzts-0kareem0s-projects.vercel.app/))]
+[https://kitchen-ai-seven.vercel.app/](https://kitchen-ai-seven.vercel.app/)
 ---
 
 **Made with ❤️ by [Kareem](https://github.com/0Kareem0)**
