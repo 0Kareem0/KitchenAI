@@ -1,31 +1,51 @@
 import React, { useEffect, useRef, useState } from "react";
 import IngredientsList from "../components/IngredientsList";
 import ClaudeRecipe from "../components/ClaudeRecipe";
+import Confetti from "../components/Confetti";
 import { getRecipeFromMistral } from "../logic/ai";
 import { PlusIcon, SparklesIcon, ChefHatIcon, FilterIcon, RefreshIcon } from "../components/Icons";
 
-const QUICK_PRESETS = [
-  { name: "Pasta", icon: "🍝" },
-  { name: "Ground Beef", icon: "🥩" },
-  { name: "Tomato Paste", icon: "🍅" },
-  { name: "Garlic", icon: "🧄" },
-  { name: "Parmesan", icon: "🧀" },
-  { name: "Olive Oil", icon: "🫒" },
-  { name: "Onion", icon: "🧅" },
-  { name: "Eggs", icon: "🥚" },
-  { name: "Avocado", icon: "🥑" },
-  { name: "Butter", icon: "🧈" },
-  { name: "Lemon", icon: "🍋" },
-  { name: "Basil", icon: "🌿" }
+const CATEGORIZED_PRESETS = [
+  { name: "Pasta", icon: "🍝", category: "Carbs" },
+  { name: "Rice", icon: "🍚", category: "Carbs" },
+  { name: "Ground Beef", icon: "🥩", category: "Proteins" },
+  { name: "Chicken Breast", icon: "🍗", category: "Proteins" },
+  { name: "Salmon", icon: "🐟", category: "Proteins" },
+  { name: "Tomato Paste", icon: "🍅", category: "Produce" },
+  { name: "Garlic", icon: "🧄", category: "Produce" },
+  { name: "Onion", icon: "🧅", category: "Produce" },
+  { name: "Avocado", icon: "🥑", category: "Produce" },
+  { name: "Spinach", icon: "🥬", category: "Produce" },
+  { name: "Parmesan", icon: "🧀", category: "Dairy" },
+  { name: "Butter", icon: "🧈", category: "Dairy" },
+  { name: "Eggs", icon: "🥚", category: "Dairy" },
+  { name: "Olive Oil", icon: "🫒", category: "Spices" },
+  { name: "Lemon", icon: "🍋", category: "Produce" },
+  { name: "Basil", icon: "🌿", category: "Spices" },
+  { name: "Chili Flakes", icon: "🌶️", category: "Spices" },
+  { name: "Black Pepper", icon: "🧂", category: "Spices" }
 ];
 
-export default function Main({ onSavedCountChange, onSaveRecipeTrigger }) {
+const SUGGESTIONS_DATABASE = [
+  "Garlic", "Garlic Powder", "Olive Oil", "Extra Virgin Olive Oil", "Onion", "Red Onion",
+  "Tomatoes", "Tomato Paste", "Cherry Tomatoes", "Basil", "Oregano", "Thyme", "Rosmary",
+  "Pasta", "Spaghetti", "Penne", "Rice", "Basmati Rice", "Ground Beef", "Chicken Breast",
+  "Salmon Fillet", "Shrimp", "Parmesan", "Mozzarella", "Cheddar", "Butter", "Eggs",
+  "Heavy Cream", "Avocado", "Lemon", "Lime", "Spinach", "Mushrooms", "Bell Pepper",
+  "Chili Flakes", "Paprika", "Cumin", "Soy Sauce", "Honey", "Dijon Mustard"
+];
+
+export default function Main({ onSavedCountChange }) {
   const [ingredients, setIngredients] = useState([
     "Pasta",
     "Ground Beef",
     "Tomato Paste",
     "Garlic"
   ]);
+
+  const [inputValue, setInputValue] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("All");
 
   const [recipeShown, setRecipeShown] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -37,8 +57,9 @@ export default function Main({ onSavedCountChange, onSaveRecipeTrigger }) {
   const [dietary, setDietary] = useState("None");
   const [showPreferences, setShowPreferences] = useState(false);
 
-  // Error / Toast state
+  // Toast / Confetti state
   const [errorMsg, setErrorMsg] = useState("");
+  const [showConfetti, setShowConfetti] = useState(false);
 
   // Saved recipes state
   const [savedRecipes, setSavedRecipes] = useState(() => {
@@ -74,6 +95,26 @@ export default function Main({ onSavedCountChange, onSaveRecipeTrigger }) {
     return () => clearInterval(interval);
   }, [isLoading]);
 
+  // Handle Autocomplete filtering
+  const handleInputChange = (e) => {
+    const val = e.target.value;
+    setInputValue(val);
+    if (val.trim().length >= 1) {
+      const filtered = SUGGESTIONS_DATABASE.filter(
+        (item) => item.toLowerCase().includes(val.toLowerCase()) && !ingredients.some((ing) => ing.toLowerCase() === item.toLowerCase())
+      ).slice(0, 5);
+      setSuggestions(filtered);
+    } else {
+      setSuggestions([]);
+    }
+  };
+
+  const selectSuggestion = (item) => {
+    handleAddIngredient(item);
+    setInputValue("");
+    setSuggestions([]);
+  };
+
   const getRecipe = async () => {
     if (ingredients.length < 2) {
       setErrorMsg("Please add at least 2 ingredients to generate a recipe.");
@@ -88,6 +129,9 @@ export default function Main({ onSavedCountChange, onSaveRecipeTrigger }) {
     try {
       const recipe = await getRecipeFromMistral(ingredients, { cuisine, mealType, dietary });
       setRecipeShown(recipe);
+      // Trigger celebration confetti!
+      setShowConfetti(true);
+      setTimeout(() => setShowConfetti(false), 3000);
     } catch (error) {
       console.error("Failed to fetch recipe:", error);
       setErrorMsg("Sorry, something went wrong while generating the recipe. Please try again.");
@@ -100,7 +144,6 @@ export default function Main({ onSavedCountChange, onSaveRecipeTrigger }) {
     const trimmed = ingredientName.trim();
     if (!trimmed) return;
 
-    // Check duplicate case-insensitive
     if (ingredients.some((ing) => ing.toLowerCase() === trimmed.toLowerCase())) {
       setErrorMsg(`"${trimmed}" is already in your ingredients list.`);
       setTimeout(() => setErrorMsg(""), 3000);
@@ -113,11 +156,10 @@ export default function Main({ onSavedCountChange, onSaveRecipeTrigger }) {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const newIngredient = formData.get("ingredient");
-    if (newIngredient) {
-      handleAddIngredient(newIngredient);
-      event.currentTarget.reset();
+    if (inputValue) {
+      handleAddIngredient(inputValue);
+      setInputValue("");
+      setSuggestions([]);
     }
   };
 
@@ -133,19 +175,16 @@ export default function Main({ onSavedCountChange, onSaveRecipeTrigger }) {
   const handleSaveRecipe = () => {
     if (!recipeShown) return;
 
-    // Extract title from markdown if possible
     const titleMatch = recipeShown.match(/^#\s+(.+)$/m);
     const title = titleMatch ? titleMatch[1].replace(/[👨‍🍳✨]/g, "").trim() : "Gourmet Recipe";
 
     const existingIndex = savedRecipes.findIndex((r) => r.content === recipeShown);
 
     if (existingIndex >= 0) {
-      // Unsave if already saved
       const updated = savedRecipes.filter((_, i) => i !== existingIndex);
       setSavedRecipes(updated);
       localStorage.setItem("chef_claude_saved_recipes", JSON.stringify(updated));
     } else {
-      // Save recipe
       const newSavedItem = {
         id: Date.now().toString(),
         title,
@@ -156,6 +195,9 @@ export default function Main({ onSavedCountChange, onSaveRecipeTrigger }) {
       const updated = [newSavedItem, ...savedRecipes];
       setSavedRecipes(updated);
       localStorage.setItem("chef_claude_saved_recipes", JSON.stringify(updated));
+      // Trigger confetti on save
+      setShowConfetti(true);
+      setTimeout(() => setShowConfetti(false), 3000);
     }
   };
 
@@ -167,8 +209,14 @@ export default function Main({ onSavedCountChange, onSaveRecipeTrigger }) {
     { title: "Writing Step-by-Step Directions...", subtitle: "Finalizing presentation notes and chef tips" }
   ];
 
+  const filteredPresets = selectedCategory === "All"
+    ? CATEGORIZED_PRESETS
+    : CATEGORIZED_PRESETS.filter(p => p.category === selectedCategory);
+
   return (
     <main className="main-content">
+      <Confetti active={showConfetti} />
+
       {/* Hero Header Section */}
       <section className="hero-section">
         <div className="hero-pill">
@@ -179,23 +227,36 @@ export default function Main({ onSavedCountChange, onSaveRecipeTrigger }) {
           Add your available ingredients below. Chef Claude will craft an incredible custom recipe tailored just for you.
         </p>
 
-        {/* Form Input */}
-        <form onSubmit={handleSubmit} className="add-ingredient-form">
-          <div className="input-wrapper">
-            <input
-              type="text"
-              placeholder="e.g. Fresh Garlic, Olive Oil, Salmon..."
-              aria-label="Add ingredient"
-              name="ingredient"
-              className="ingredient-input"
-              autoComplete="off"
-            />
-          </div>
-          <button type="submit" className="add-btn">
-            <PlusIcon className="btn-icon" />
-            <span>Add Item</span>
-          </button>
-        </form>
+        {/* Form Input with Autocomplete */}
+        <div className="form-autocomplete-container">
+          <form onSubmit={handleSubmit} className="add-ingredient-form">
+            <div className="input-wrapper">
+              <input
+                type="text"
+                placeholder="e.g. Fresh Garlic, Olive Oil, Salmon..."
+                aria-label="Add ingredient"
+                name="ingredient"
+                value={inputValue}
+                onChange={handleInputChange}
+                className="ingredient-input"
+                autoComplete="off"
+              />
+              {suggestions.length > 0 && (
+                <ul className="autocomplete-dropdown">
+                  {suggestions.map((item) => (
+                    <li key={item} onClick={() => selectSuggestion(item)}>
+                      <PlusIcon className="btn-icon-xs" /> {item}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            <button type="submit" className="add-btn">
+              <PlusIcon className="btn-icon" />
+              <span>Add Item</span>
+            </button>
+          </form>
+        </div>
 
         {/* Error Toast */}
         {errorMsg && (
@@ -204,11 +265,23 @@ export default function Main({ onSavedCountChange, onSaveRecipeTrigger }) {
           </div>
         )}
 
-        {/* Quick Add Presets */}
+        {/* Quick Add Presets with Category Filter Pills */}
         <div className="quick-presets">
-          <span className="presets-label">Quick Add:</span>
+          <div className="preset-categories-bar">
+            {["All", "Proteins", "Produce", "Carbs", "Dairy", "Spices"].map((cat) => (
+              <button
+                key={cat}
+                type="button"
+                className={`category-pill ${selectedCategory === cat ? "active" : ""}`}
+                onClick={() => setSelectedCategory(cat)}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+
           <div className="preset-chips-scroll">
-            {QUICK_PRESETS.map((item) => {
+            {filteredPresets.map((item) => {
               const isAdded = ingredients.some((ing) => ing.toLowerCase() === item.name.toLowerCase());
               return (
                 <button
@@ -333,6 +406,7 @@ export default function Main({ onSavedCountChange, onSaveRecipeTrigger }) {
           recipe={recipeShown} 
           onSaveRecipe={handleSaveRecipe}
           isSaved={isCurrentRecipeSaved}
+          ingredients={ingredients}
         />
       )}
     </main>
